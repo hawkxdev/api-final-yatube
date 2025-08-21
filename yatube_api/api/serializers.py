@@ -1,23 +1,63 @@
+"""Сериализаторы API."""
+
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
+from posts.models import Comment, Group, Post, Follow
 
-from posts.models import Comment, Post
+User = get_user_model()
 
 
 class PostSerializer(serializers.ModelSerializer):
+    """Сериализатор постов."""
+
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         fields = '__all__'
         model = Post
+        read_only_fields = ('author',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
+    """Сериализатор комментариев."""
+
+    author = SlugRelatedField(read_only=True, slug_field='username')
 
     class Meta:
         fields = '__all__'
         model = Comment
+        read_only_fields = ('author', 'post')
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    """Сериализатор групп."""
+
+    class Meta:
+        fields = '__all__'
+        model = Group
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    """Сериализатор подписок."""
+
+    user = SlugRelatedField(slug_field='username', read_only=True)
+    following = SlugRelatedField(
+        slug_field='username', queryset=User.objects.all()
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Follow
+
+    def validate(self, data):
+        """Проверка самоподписки."""
+        user = self.context['request'].user
+        following = data['following']
+
+        if user == following:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на себя!'
+            )
+        return data
