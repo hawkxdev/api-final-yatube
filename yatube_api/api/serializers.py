@@ -16,7 +16,7 @@ class PostSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'pub_date', 'author', 'image', 'group')
         model = Post
         read_only_fields = ('author',)
 
@@ -27,7 +27,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(read_only=True, slug_field='username')
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'author', 'post', 'text', 'created')
         model = Comment
         read_only_fields = ('author', 'post')
 
@@ -36,7 +36,7 @@ class GroupSerializer(serializers.ModelSerializer):
     """Сериализатор групп."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'title', 'slug', 'description')
         model = Group
 
 
@@ -49,7 +49,7 @@ class FollowSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'user', 'following')
         model = Follow
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
