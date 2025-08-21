@@ -1,13 +1,14 @@
 """ViewSets для API."""
 
+from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, pagination, permissions, viewsets
-
 from posts.models import Group, Post
+from rest_framework import filters, mixins, pagination, permissions, viewsets
+from rest_framework.serializers import BaseSerializer
+
 from .permissions import AuthorOnlyEditPermission
-from .serializers import (
-    CommentSerializer, FollowSerializer, GroupSerializer, PostSerializer
-)
+from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
+                          PostSerializer)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -18,7 +19,7 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorOnlyEditPermission,)
     pagination_class = pagination.LimitOffsetPagination
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BaseSerializer) -> None:
         """Привязка автора."""
         serializer.save(author=self.request.user)
 
@@ -30,12 +31,12 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorOnlyEditPermission,)
     pagination_class = None
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """Комментарии к посту."""
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         return post.comments.all()
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BaseSerializer) -> None:
         """Привязка автора и поста."""
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         serializer.save(author=self.request.user, post=post)
@@ -63,10 +64,10 @@ class FollowViewSet(
     search_fields = ('following__username',)
     pagination_class = None
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """Подписки пользователя."""
         return self.request.user.follower.all()
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BaseSerializer) -> None:
         """Привязка пользователя."""
         serializer.save(user=self.request.user)

@@ -17,7 +17,7 @@ class Group(models.Model):
         verbose_name = 'Группа'
         verbose_name_plural = 'Группы'
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Название группы."""
         return self.title
 
@@ -35,7 +35,7 @@ class Post(models.Model):
         Group, on_delete=models.SET_NULL, related_name='posts',
         blank=True, null=True, verbose_name='Группа')
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Текст поста."""
         return self.text
 
@@ -51,7 +51,7 @@ class Comment(models.Model):
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Комментарий автора."""
         return f'Комментарий {self.author} к посту {self.post.id}'
 
@@ -76,6 +76,6 @@ class Follow(models.Model):
             )
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Подписка пользователя."""
         return f'{self.user} подписан на {self.following}'
