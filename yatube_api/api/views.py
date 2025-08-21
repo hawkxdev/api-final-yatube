@@ -13,7 +13,7 @@ from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
 
 class PostViewSet(viewsets.ModelViewSet):
     """ViewSet для постов."""
-    
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (AuthorOnlyEditPermission,)
