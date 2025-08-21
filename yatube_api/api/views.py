@@ -14,7 +14,7 @@ from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
 class PostViewSet(viewsets.ModelViewSet):
     """ViewSet для постов."""
 
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().select_related('author', 'group')
     serializer_class = PostSerializer
     permission_classes = (AuthorOnlyEditPermission,)
     pagination_class = pagination.LimitOffsetPagination
@@ -34,7 +34,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self) -> QuerySet:
         """Комментарии к посту."""
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-        return post.comments.all()
+        return post.comments.all().select_related('author')
 
     def perform_create(self, serializer: BaseSerializer) -> None:
         """Привязка автора и поста."""
