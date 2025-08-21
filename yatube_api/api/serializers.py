@@ -52,7 +52,7 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
 
     def validate(self, data):
-        """Проверка самоподписки."""
+        """Проверка самоподписки и дублирования."""
         user = self.context['request'].user
         following = data['following']
 
@@ -60,4 +60,10 @@ class FollowSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя подписаться на себя!'
             )
+
+        if Follow.objects.filter(user=user, following=following).exists():
+            raise serializers.ValidationError(
+                'Вы уже подписаны на этого пользователя!'
+            )
+
         return data
